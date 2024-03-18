@@ -1,5 +1,5 @@
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import process from 'process';
+import * as process from 'process';
 import { hash } from 'bcrypt';
 
 @Entity('users')
