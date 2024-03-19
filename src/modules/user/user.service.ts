@@ -65,6 +65,12 @@ export class UserService {
     return userByEmail;
   }
 
+  public async getUserById(id: number): Promise<UserEntity> {
+    return await this.userRepository.findOne({
+      where: { id },
+    });
+  }
+
   public buildUserResponse(user: UserEntity): UserResponseInterface {
     delete user.password;
     return {
