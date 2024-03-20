@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../../guards/auth.guard';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { User } from '../../decorators/user.decorator';
@@ -19,5 +19,10 @@ export class CommentController {
     @Body('comment') createCommentDto: CreateCommentDto,
   ): Promise<any> {
     return this.commentService.createComment(createCommentDto, currentUserId);
+  }
+
+  @Get()
+  async getCommentWithReplies(@Param(':id') commentId): Promise<any> {
+    return this.commentService.getComments(commentId);
   }
 }
