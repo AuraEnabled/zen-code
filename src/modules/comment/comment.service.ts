@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentEntity } from '../../entities/comment.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/createComment.dto';
 
 @Injectable()
@@ -9,6 +9,7 @@ export class CommentService {
   constructor(
     @InjectRepository(CommentEntity)
     private readonly commentRepository: Repository<CommentEntity>,
+    private dataSource: DataSource,
   ) {}
 
   public async createComment(
@@ -38,7 +39,31 @@ export class CommentService {
     return await this.commentRepository.findOne({
       where: { id },
       relations: ['replies'],
+      loadEagerRelations: true,
     });
+  }
+
+  public async getCommentsRecursive(): Promise<CommentEntity[]> {
+    const comments = await this.dataSource.manager.query(`
+  with recursive cte ("id", "authorId", "replyToId", "text") as (
+  select     "id",
+             "authorId",
+             "replyToId",
+             "text"
+  from       "comments"
+  union all
+  select     p."id",
+             p."authorId",
+             p."replyToId",
+             p."text"
+  from       "comments" p
+  inner join cte
+          on p."replyToId" = cte.id
+  )
+select * from cte;
+    `);
+
+    return comments;
   }
 
   private async getCommentById(id: number): Promise<CommentEntity> {

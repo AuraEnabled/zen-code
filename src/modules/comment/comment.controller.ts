@@ -20,9 +20,4 @@ export class CommentController {
   ): Promise<any> {
     return this.commentService.createComment(createCommentDto, currentUserId);
   }
-
-  @Get()
-  async getCommentWithReplies(@Param(':id') commentId): Promise<any> {
-    return this.commentService.getComments(commentId);
-  }
 }
